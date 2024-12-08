@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartfleet
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+security:
+  user:
+    name: admin
+    password: 23180d51-862e-4ef4-a5be-e595ceeab62c
