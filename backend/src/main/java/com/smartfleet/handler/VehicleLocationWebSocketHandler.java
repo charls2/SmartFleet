@@ -1,11 +1,13 @@
 package com.smartfleet.handler;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class VehicleLocationWebSocketHandler extends TextWebSocketHandler {
 
     // Map to keep track of WebSocket sessions

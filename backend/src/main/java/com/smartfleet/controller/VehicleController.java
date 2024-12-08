@@ -15,15 +15,35 @@ import java.util.ArrayList;
 @RequestMapping("/vehicles")
 public class VehicleController {
 
+    List<Vehicle> vehicles = new ArrayList<>();
+    
+
     @Autowired
     private VehicleService vehicleService;
 
     @PostMapping("/{vehicleId}/location")
-    public ResponseEntity<String> updateLocation(
-            @PathVariable String vehicleId,
-            @RequestBody LocationUpdate locationUpdate) {
+    public ResponseEntity<String> updateLocation(@PathVariable String vehicleId, @RequestBody LocationUpdate locationUpdate) {
         vehicleService.updateLocation(vehicleId, locationUpdate);
         return ResponseEntity.ok("Location updated");
+    }
+
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable String vehicleId) {
+        // Mocked logic to find a vehicle by ID
+        List<Vehicle> vehicles = new ArrayList<>(); // access from PSQL no?
+        vehicles.add(new Vehicle("123", "Truck", "Ford F-150"));
+        vehicles.add(new Vehicle("124", "Van", "Mercedes Sprinter"));
+
+        Vehicle vehicle = vehicles.stream()
+                                  .filter(v -> v.getId().equals(vehicleId))
+                                  .findFirst()
+                                  .orElse(null);
+
+        if (vehicle == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(vehicle);
     }
 
     @GetMapping("/{vehicleId}/location")
@@ -34,9 +54,7 @@ public class VehicleController {
 
     @GetMapping
     public ResponseEntity<List<Vehicle>> getVehicles() {
-    	List<Vehicle> vehicles = new ArrayList<>();
-        vehicles.add(new Vehicle("123", "Truck", "Ford F-150"));
-	vehicles.add(new Vehicle("124", "Van", "Mercedes Sprinter"));
+        vehicles.add(new Vehicle("12345", "SPRINTER", "Ford"));
         return ResponseEntity.ok(vehicles);
     }
 }

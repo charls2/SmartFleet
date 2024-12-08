@@ -1,4 +1,4 @@
-package com.smartfleet.backend;
+package com.smartfleet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
