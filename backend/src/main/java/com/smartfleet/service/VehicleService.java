@@ -1,22 +1,30 @@
 package com.smartfleet.service;
 
-import com.smartfleet.dto.LocationUpdate;
+import com.smartfleet.model.Vehicle;
+import com.smartfleet.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VehicleService {
 
-    private final Map<String, LocationUpdate> locationCache = new ConcurrentHashMap<>();
+    private final VehicleRepository vehicleRepository;
 
-    public void updateLocation(String vehicleId, LocationUpdate locationUpdate) {
-        // Save location in cache or database
-        locationCache.put(vehicleId, locationUpdate);
+    public VehicleService(VehicleRepository vehicleRepository) {
+        this.vehicleRepository = vehicleRepository;
     }
 
-    public LocationUpdate getLocation(String vehicleId) {
-        return locationCache.getOrDefault(vehicleId, null);
+    public List<Vehicle> getAllVehicles() {
+        return vehicleRepository.findAll();
+    }
+
+    public Optional<Vehicle> getVehicleById(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId);
+    }
+
+    public Vehicle addVehicle(Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
     }
 }

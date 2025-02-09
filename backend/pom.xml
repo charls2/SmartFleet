@@ -11,7 +11,7 @@
 	<groupId>com.smartfleet</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SmartFleet backend</name>
+	<name>SmartFleet AI</name>
 	<description>SmartFleet AI - Track your fleet</description>
 	<url/>
 	<licenses>

@@ -1,31 +1,43 @@
 package com.smartfleet.model;
 
-public class Vehicle {
-    private String id;
-    private String type;
-    private String model;
+import jakarta.persistence.*;
 
-    public Vehicle(String id, String type, String model) {
-        this.id = id;
-        this.type = type;
+@Entity
+@Table(name="vehicle")
+public class Vehicle {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Primary Key
+    private String model;
+    private String brand;
+    private String color;
+    private String engineModel;
+    private String fuelType;
+    private String gearType;
+
+//    @OneToOne
+//    private Location loc;
+
+
+    public Vehicle(String model, String brand, String color, String engineModel, String fuelType, String gearType) {
         this.model = model;
+        this.brand = brand;
+        this.color = color;
+        this.engineModel = engineModel;
+        this.fuelType = fuelType;
+        this.gearType = gearType;
     }
 
-    // Getters and setters
-    public String getId() {
+    public Vehicle() {}
+
+    // Getters and Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getModel() {
@@ -35,4 +47,52 @@ public class Vehicle {
     public void setModel(String model) {
         this.model = model;
     }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getEngineModel() {
+        return engineModel;
+    }
+
+    public void setEngineModel(String engineModel) {
+        this.engineModel = engineModel;
+    }
+
+    public String getFuelType() {
+        return fuelType;
+    }
+
+    public void setFuelType(String fuelType) {
+        this.fuelType = fuelType;
+    }
+
+    public String getGearType() {
+        return gearType;
+    }
+
+    public void setGearType(String gearType) {
+        this.gearType = gearType;
+    }
+
+//    public Location getLoc() {
+//        return loc;
+//    }
+//
+//    public void setLoc(Location loc) {
+//        this.loc = loc;
+//    }
 }

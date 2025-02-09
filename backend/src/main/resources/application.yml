@@ -1,7 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/smartfleet
-    username: postgres
+    username:
     password: 1234
   jpa:
     hibernate:

@@ -10,9 +10,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .authorizeHttpRequests()
-            .anyRequest().permitAll();
+        http
+                .csrf(csrf -> csrf.disable())  // Use the new lambda-based syntax
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()); // Configure authorization
+
         return http.build();
     }
 }

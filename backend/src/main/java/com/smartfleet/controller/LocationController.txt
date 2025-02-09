@@ -1,0 +1,47 @@
+package com.smartfleet.controller;
+
+import com.smartfleet.dto.VehicleLocationDTO;
+import com.smartfleet.model.Location;
+import com.smartfleet.service.LocationService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/vehicles")
+public class LocationController {
+
+    private final LocationService locationService;
+
+    public LocationController(LocationService locationService) {
+        this.locationService = locationService;
+    }
+
+    @GetMapping("/{vehicleId}/location")
+    public ResponseEntity<Location> getLocationByVehicleId(@PathVariable String vehicleId) {
+        Optional<Location> location = locationService.getLocationByVehicleId(vehicleId);
+        if (location.isPresent()) {
+            return ResponseEntity.ok(location.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Endpoint to update vehicle location
+    @GetMapping("/{vehicleId}/location")
+    public ResponseEntity<String> updateVehicleLocation(
+            @PathVariable String vehicleId,
+            @Valid @RequestBody VehicleLocationDTO vehicleLocationDTO) {
+
+        // Set the vehicleId from the path variable
+        vehicleLocationDTO.setVehicleId(vehicleId);
+
+        // Call service to process location update
+        vehicleService.updateLocation(vehicleLocationDTO);
+
+        return new ResponseEntity<>("Vehicle location updated successfully", HttpStatus.OK);
+    }
+}
