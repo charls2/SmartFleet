@@ -31,6 +31,7 @@ google-application-credentials.json
 credentials.json
 **/credentials.json
 gcloud-application-credentials.json
+smartfleet-e5bdc-firebase-adminsdk-fbsvc-d0293a17e2.json
 
 # Optional secret directories
 secrets/

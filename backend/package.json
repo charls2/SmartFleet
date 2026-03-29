@@ -9,7 +9,8 @@
     "start": "node dist/src/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "firestore:init": "tsx scripts/initFirestore.ts"
   },
   "engines": {
     "node": ">=20"

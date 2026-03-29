@@ -31,10 +31,25 @@ npm run dev      # tsx watch
 npm run build
 npm start        # node dist/src/index.js
 npm test
-npm run seed   # demo documents (companies, vehicles + telemetry, drivers, deliveries, alerts, fleetStats)
+npm run firestore:init   # create all collection paths + telemetry subcollection (no demo tenant data)
+npm run seed             # same as init, then demo data for cmp_1
 ```
 
-**First-time Firestore:** In [Firebase Console](https://console.firebase.google.com/) → your project → **Build → Firestore Database** → create the database (production or test mode). Then run `npm run seed` from `backend/` with valid credentials in `.env`.
+**First-time Firestore:** In [Firebase Console](https://console.firebase.google.com/) → your project → **Build → Firestore Database** → create the **database** once (Native mode). You do **not** need to add collections by hand: run `npm run firestore:init` (or `npm run seed`) from `backend/` with valid credentials.
+
+**Schema (auto-created on first write):**
+
+| Root collection | Document id (bootstrap) | Notes |
+|-----------------|-------------------------|--------|
+| `companies` | `_smartfleet_bootstrap` | Real tenant docs use your `companyId` |
+| `vehicles` | `_smartfleet_bootstrap` | Hot state per vehicle |
+| `vehicles/{id}/telemetry` | `_smartfleet_bootstrap` | High-write history; auto IDs in production |
+| `drivers` | `_smartfleet_bootstrap` | |
+| `deliveries` | `_smartfleet_bootstrap` | |
+| `alerts` | `_smartfleet_bootstrap` | |
+| `fleetStats` | `_smartfleet_bootstrap` | Per-company stats use `companyId` as doc id |
+
+Bootstrap docs have **no `companyId`**, so they do not appear in API queries filtered by `x-company-id`.
 
 **API calls after seeding:** use header `x-company-id: cmp_1` (demo tenant written by the seed script).
 

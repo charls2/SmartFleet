@@ -1,12 +1,17 @@
-# React + Vite
+# SmartFleet AI — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dashboard for the Node/Firestore API: fleet stats, vehicles, open alerts, and deliveries.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Start the backend (`backend/`: `npm run dev`, default `http://localhost:8080`).
+2. Optional: copy `.env.example` to `.env` and set `VITE_API_URL` if the API is not on localhost:8080.
+3. `npm install` then `npm run dev` (Vite, usually `http://localhost:5173`).
 
-## Expanding the ESLint configuration
+## Tenant
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The UI sends `x-company-id` on every data request. Default tenant is `cmp_1` (matches `npm run seed` in `backend/`). Change it in the header and click **Apply**; it is stored in `localStorage`.
+
+## Health
+
+The pill in the header calls `GET /health` (no tenant required).
