@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+spring:
+  security:
+    user:
+      name: admin
+      password: 23180d51-862e-4ef4-a5be-e595ceeab62c

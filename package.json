@@ -1,0 +1,5 @@
+{
+  "name": "smartfleet",
+  "private": true,
+  "description": "SmartFleet monorepo (backend + frontend)"
+}

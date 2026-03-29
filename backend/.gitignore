@@ -1,33 +1,26 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+node_modules/
+dist/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Environment & secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+.env.local
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Keys & certs
+*.pem
+*.key
+*.p12
+*.pfx
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# Firebase / GCP
+*-firebase-adminsdk-*.json
+**/serviceAccount*.json
+google-application-credentials.json
+credentials.json
+SmartFleet/smartfleet-e5bdc-firebase-adminsdk-fbsvc-d0293a17e2.json
 
-### VS Code ###
-.vscode/
+*.log
+coverage/
+.DS_Store

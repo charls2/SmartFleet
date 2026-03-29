@@ -1,0 +1,14 @@
+# SmartFleet API container. For Firestore emulator, run separately:
+#   firebase emulators:start --only firestore
+# Then set FIRESTORE_EMULATOR_HOST=host.docker.internal:8080 (or your host IP) and GCLOUD_PROJECT.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      GCLOUD_PROJECT: ${GCLOUD_PROJECT:-demo-smartfleet}
+      # GOOGLE_APPLICATION_CREDENTIALS: mount a secret in production
