@@ -1,7 +1,9 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import { authRouter } from "./auth/routes.js";
 import { requireCompanyContext } from "./auth/middleware.js";
+import { requireWriteAccess } from "./auth/writeAccess.js";
 import { companiesRouter } from "./companies/routes.js";
 import { vehiclesRouter } from "./vehicles/routes.js";
 import { driversRouter } from "./drivers/routes.js";
@@ -19,7 +21,10 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "smartfleet-backend" });
 });
 
+app.use("/auth", authRouter);
+
 app.use(requireCompanyContext);
+app.use(requireWriteAccess);
 
 app.use("/companies", companiesRouter);
 app.use("/vehicles", vehiclesRouter);

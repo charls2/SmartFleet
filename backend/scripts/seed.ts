@@ -19,6 +19,7 @@ async function main() {
     name: "Smart Logistics Inc",
     plan: "PRO",
     vehicleCount: 5,
+    inviteCode: "seedinvitedemo01",
     createdAt: FieldValue.serverTimestamp(),
   });
 

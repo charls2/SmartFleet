@@ -73,6 +73,53 @@ vehiclesRouter.post("/", async (req, res) => {
   }
 });
 
+/** Recent GPS samples for map trail (newest last). */
+vehiclesRouter.get("/:vehicleId/telemetry", async (req, res) => {
+  try {
+    const { vehicleId } = req.params;
+    const rawLimit = req.query.limit;
+    const limit = Math.min(
+      200,
+      Math.max(1, typeof rawLimit === "string" ? parseInt(rawLimit, 10) || 80 : 80)
+    );
+    const vehicleRef = db.collection("vehicles").doc(vehicleId);
+    const vSnap = await vehicleRef.get();
+    if (!vSnap.exists) {
+      throw new HttpError(404, "Vehicle not found");
+    }
+    if (vSnap.data()!.companyId !== req.companyId) {
+      throw new HttpError(403, "Forbidden");
+    }
+    let snap;
+    try {
+      snap = await vehicleRef
+        .collection("telemetry")
+        .orderBy("timestamp", "desc")
+        .limit(limit)
+        .get();
+    } catch {
+      snap = await vehicleRef.collection("telemetry").limit(limit).get();
+    }
+    const points = snap.docs
+      .map((d) => {
+        const x = d.data();
+        return {
+          id: d.id,
+          lat: x.lat as number,
+          lng: x.lng as number,
+          speed: x.speed,
+          heading: x.heading,
+          fuel: x.fuel,
+          timestamp: serializeTimestamp(x.timestamp),
+        };
+      })
+      .sort((a, b) => (a.timestamp ?? "").localeCompare(b.timestamp ?? ""));
+    return res.json({ vehicleId, points });
+  } catch (e) {
+    return sendError(res, e);
+  }
+});
+
 vehiclesRouter.get("/:vehicleId", async (req, res) => {
   try {
     const { vehicleId } = req.params;
