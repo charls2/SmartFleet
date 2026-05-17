@@ -187,6 +187,9 @@ async function main() {
     status: "IN_PROGRESS",
     pickup: { lat: 45.5, lng: -73.57 },
     dropoff: { lat: 45.54, lng: -73.6 },
+    pickupLabel: "Port of Montreal — Gate 4",
+    dropoffLabel: "Laval DC — Receiving",
+    orderNotes: "Call receiver 15 min before arrival. Dock B only.",
     createdAt: FieldValue.serverTimestamp(),
     startedAt: FieldValue.serverTimestamp(),
     completedAt: null,
@@ -199,6 +202,9 @@ async function main() {
     status: "IN_PROGRESS",
     pickup: { lat: 45.507, lng: -73.564 },
     dropoff: { lat: 45.515, lng: -73.552 },
+    pickupLabel: "Old Port warehouse",
+    dropoffLabel: "Rosemont retail hub",
+    orderNotes: "Fragile — keep upright.",
     createdAt: FieldValue.serverTimestamp(),
     startedAt: FieldValue.serverTimestamp(),
     completedAt: null,
@@ -211,9 +217,26 @@ async function main() {
     status: "COMPLETED",
     pickup: { lat: 45.512, lng: -73.551 },
     dropoff: { lat: 45.499, lng: -73.59 },
+    pickupLabel: "South Shore depot",
+    dropoffLabel: "West Island customer",
     createdAt: FieldValue.serverTimestamp(),
     startedAt: FieldValue.serverTimestamp(),
     completedAt: FieldValue.serverTimestamp(),
+  });
+
+  await db.collection("deliveries").doc("del_4").set({
+    companyId: COMPANY_ID,
+    vehicleId: "veh_1",
+    driverId: "drv_1",
+    status: "PENDING",
+    pickup: { lat: 45.495, lng: -73.58 },
+    dropoff: { lat: 45.528, lng: -73.61 },
+    pickupLabel: "Brossard cross-dock",
+    dropoffLabel: "Airport cargo zone",
+    orderNotes: "Scheduled after current run.",
+    createdAt: FieldValue.serverTimestamp(),
+    startedAt: null,
+    completedAt: null,
   });
 
   await db.collection("alerts").doc("alert_1").set({

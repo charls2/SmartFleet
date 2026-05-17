@@ -64,6 +64,9 @@ export interface Delivery {
   status: DeliveryStatus;
   pickup: VehicleLocation;
   dropoff: VehicleLocation;
+  pickupLabel?: string | null;
+  dropoffLabel?: string | null;
+  orderNotes?: string | null;
   createdAt: FirestoreTimestamp;
   startedAt?: FirestoreTimestamp | null;
   completedAt?: FirestoreTimestamp | null;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -12,6 +12,20 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   iconRetinaUrl: markerIcon2x,
   shadowUrl: markerShadow,
+});
+
+const pickupIcon = L.divIcon({
+  className: "map-pin map-pin-pickup",
+  html: "<span>P</span>",
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+});
+
+const dropoffIcon = L.divIcon({
+  className: "map-pin map-pin-dropoff",
+  html: "<span>D</span>",
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
 });
 
 function formatTime(iso) {
@@ -47,9 +61,18 @@ function isValidCoord(lat, lng) {
 /**
  * @param {object} props
  * @param {unknown[]} props.vehicles
- * @param {[number, number][]} [props.trailPositions] — optional GPS trail (e.g. recent telemetry)
+ * @param {[number, number][]} [props.trailPositions]
+ * @param {{ pickup: [number, number], dropoff: [number, number] } | null} [props.highlightDelivery]
+ * @param {[number, number][]} [props.routePositions]
+ * @param {[number, number] | null} [props.driverPosition]
  */
-export default function FleetMap({ vehicles, trailPositions = [] }) {
+export default function FleetMap({
+  vehicles,
+  trailPositions = [],
+  highlightDelivery = null,
+  routePositions = [],
+  driverPosition = null,
+}) {
   const valid = useMemo(
     () =>
       Array.isArray(vehicles)
@@ -59,30 +82,51 @@ export default function FleetMap({ vehicles, trailPositions = [] }) {
   );
   const trailPts = useMemo(() => {
     if (!Array.isArray(trailPositions)) return [];
-    return trailPositions.filter(
-      (p) => Array.isArray(p) && isValidCoord(p[0], p[1])
-    );
+    return trailPositions.filter((p) => Array.isArray(p) && isValidCoord(p[0], p[1]));
   }, [trailPositions]);
 
-  const points = useMemo(
-    () => valid.map((v) => [v.location.lat, v.location.lng]),
-    [valid]
-  );
+  const routePts = useMemo(() => {
+    if (!Array.isArray(routePositions)) return [];
+    return routePositions.filter((p) => Array.isArray(p) && isValidCoord(p[0], p[1]));
+  }, [routePositions]);
+
+  const pickupPos = useMemo(() => {
+    if (!highlightDelivery?.pickup) return null;
+    const [lat, lng] = highlightDelivery.pickup;
+    return isValidCoord(lat, lng) ? [lat, lng] : null;
+  }, [highlightDelivery]);
+
+  const dropoffPos = useMemo(() => {
+    if (!highlightDelivery?.dropoff) return null;
+    const [lat, lng] = highlightDelivery.dropoff;
+    return isValidCoord(lat, lng) ? [lat, lng] : null;
+  }, [highlightDelivery]);
+
+  const driverPos = useMemo(() => {
+    if (!driverPosition || !Array.isArray(driverPosition)) return null;
+    const [lat, lng] = driverPosition;
+    return isValidCoord(lat, lng) ? [lat, lng] : null;
+  }, [driverPosition]);
+
+  const points = useMemo(() => valid.map((v) => [v.location.lat, v.location.lng]), [valid]);
 
   const fitPoints = useMemo(() => {
-    const merged = [...points, ...trailPts];
+    const merged = [...points, ...trailPts, ...routePts];
+    if (pickupPos) merged.push(pickupPos);
+    if (dropoffPos) merged.push(dropoffPos);
+    if (driverPos) merged.push(driverPos);
     return merged;
-  }, [points, trailPts]);
+  }, [points, trailPts, routePts, pickupPos, dropoffPos, driverPos]);
 
   const boundsKey = useMemo(
     () =>
-      `${valid.map((v) => `${v.id}:${v.location.lat}:${v.location.lng}`).join("|")}|trail:${trailPts.map((p) => `${p[0]},${p[1]}`).join(";")}`,
-    [valid, trailPts]
+      `${valid.map((v) => `${v.id}:${v.location.lat}:${v.location.lng}`).join("|")}|r:${routePts.length}|d:${driverPos}|p:${pickupPos}|o:${dropoffPos}`,
+    [valid, routePts.length, driverPos, pickupPos, dropoffPos]
   );
 
   const defaultCenter = [45.5017, -73.5673];
 
-  if (valid.length === 0 && trailPts.length === 0) {
+  if (fitPoints.length === 0) {
     return (
       <div className="map-panel map-panel-empty">
         <p className="map-empty-msg">
@@ -110,8 +154,30 @@ export default function FleetMap({ vehicles, trailPositions = [] }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitBounds boundsKey={boundsKey} points={fitPoints} />
+        {routePts.length > 1 && (
+          <Polyline positions={routePts} pathOptions={{ color: "#38bdf8", weight: 5, opacity: 0.9 }} />
+        )}
         {trailPts.length > 1 && (
-          <Polyline positions={trailPts} pathOptions={{ color: "#38bdf8", weight: 4, opacity: 0.85 }} />
+          <Polyline positions={trailPts} pathOptions={{ color: "#94a3b8", weight: 3, opacity: 0.6, dashArray: "6 8" }} />
+        )}
+        {pickupPos && (
+          <Marker position={pickupPos} icon={pickupIcon}>
+            <Popup>Pickup</Popup>
+          </Marker>
+        )}
+        {dropoffPos && (
+          <Marker position={dropoffPos} icon={dropoffIcon}>
+            <Popup>Drop-off</Popup>
+          </Marker>
+        )}
+        {driverPos && (
+          <CircleMarker
+            center={driverPos}
+            radius={10}
+            pathOptions={{ color: "#0ea5e9", fillColor: "#38bdf8", fillOpacity: 0.95, weight: 3 }}
+          >
+            <Popup>You are here</Popup>
+          </CircleMarker>
         )}
         {valid.map((v) => (
           <Marker key={v.id} position={[v.location.lat, v.location.lng]}>
@@ -128,7 +194,7 @@ export default function FleetMap({ vehicles, trailPositions = [] }) {
         ))}
       </MapContainer>
       <p className="map-attribution">
-        Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+        Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Route via OSRM
       </p>
     </div>
   );

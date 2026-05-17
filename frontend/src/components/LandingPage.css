@@ -1,0 +1,156 @@
+.landing {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.landing-hero {
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.landing-eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.landing-title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.landing-title-accent {
+  color: var(--accent);
+}
+
+.landing-lead {
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 42rem;
+}
+
+.landing-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.landing-cta-primary {
+  padding: 0.65rem 1.35rem;
+  font-size: 0.95rem;
+}
+
+.landing-note {
+  margin: 1.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  max-width: 36rem;
+  line-height: 1.5;
+}
+
+.landing-audience,
+.landing-features {
+  padding: 2.25rem 0 0;
+}
+
+.landing-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing-section-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.landing-section-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.landing-feature-grid {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.landing-feature-card {
+  margin: 0;
+  padding: 1.15rem 1.2rem;
+  border-radius: 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.landing-feature-icon {
+  display: block;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+  font-family: ui-monospace, monospace;
+}
+
+.landing-feature-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.landing-feature-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.landing-footer {
+  margin-top: 2.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.landing-footer-text {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 40rem;
+}
+
+.landing .link-like {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.landing .link-like:hover {
+  color: var(--text);
+}

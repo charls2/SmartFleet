@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../../config/firestore.js";
 
-export type UserRole = "owner" | "dispatcher" | "viewer";
+export type UserRole = "owner" | "dispatcher" | "viewer" | "driver";
 
 declare global {
   namespace Express {
@@ -11,6 +11,8 @@ declare global {
       firebaseUid?: string;
       /** Set when Bearer resolves to a Firestore user; `viewer` cannot mutate fleet data. */
       userRole?: UserRole;
+      /** Firestore drivers/{id} when user role is `driver`. */
+      linkedDriverId?: string;
     }
   }
 }
@@ -41,6 +43,9 @@ export async function requireCompanyContext(
         const data = userSnap.data()!;
         req.companyId = data.companyId as string;
         req.userRole = (data.role as UserRole) ?? "owner";
+        if (typeof data.driverId === "string" && data.driverId.length > 0) {
+          req.linkedDriverId = data.driverId;
+        }
         return next();
       }
 

@@ -11,6 +11,12 @@ export function requireWriteAccess(req: Request, res: Response, next: NextFuncti
   if (!req.firebaseUid) {
     return next();
   }
+  if (req.userRole === "driver") {
+    if (req.originalUrl.startsWith("/driver")) {
+      return next();
+    }
+    return res.status(403).json({ error: "Drivers cannot modify fleet data from this API" });
+  }
   if (req.userRole === "viewer") {
     return res.status(403).json({ error: "Read-only access (viewer role)" });
   }

@@ -18,9 +18,14 @@ import {
 } from "./api.js";
 import { auth, firebaseConfigured } from "./firebase.js";
 import AuthScreen from "./components/AuthScreen.jsx";
+import GetStartedPage from "./components/GetStartedPage.jsx";
+import LandingPage from "./components/LandingPage.jsx";
 import RegisterCompany from "./components/RegisterCompany.jsx";
 import FleetMap from "./components/FleetMap.jsx";
 import FleetOperations from "./components/FleetOperations.jsx";
+import DriverApp from "./components/DriverApp.jsx";
+import RegisterDriver from "./components/RegisterDriver.jsx";
+import { clearAuthIntent, getAuthIntent, setAuthIntent } from "./authIntent.js";
 import "./App.css";
 
 const STATUSES = ["ACTIVE", "IDLE", "MAINTENANCE", "OFFLINE"];
@@ -71,6 +76,15 @@ export default function App() {
   const [vehicleForm, setVehicleForm] = useState(emptyVehicleForm);
   const [vehicleSaving, setVehicleSaving] = useState(false);
   const [mapModalOpen, setMapModalOpen] = useState(false);
+  /** landing → getStarted (optional) → auth. Session remembers "past landing" for auth screen only. */
+  const [authFlowStep, setAuthFlowStep] = useState(() =>
+    typeof sessionStorage !== "undefined" && sessionStorage.getItem("smartfleet_landing_dismissed") === "1"
+      ? "auth"
+      : "landing"
+  );
+  const [authInitialMode, setAuthInitialMode] = useState("login");
+  const [registrationKind, setRegistrationKind] = useState("fleet");
+  const [authIntentTick, setAuthIntentTick] = useState(0);
 
   const companyId = (() => {
     if (profileLoading) return null;
@@ -81,6 +95,12 @@ export default function App() {
   })();
 
   const canWrite = profile?.role !== "viewer";
+
+  useEffect(() => {
+    if (needsRegistration && firebaseUser) {
+      setRegistrationKind(getAuthIntent());
+    }
+  }, [needsRegistration, firebaseUser, authIntentTick]);
 
   useEffect(() => {
     if (!auth) {
@@ -163,12 +183,6 @@ export default function App() {
     if (!companyId) return;
     loadDashboard();
   }, [authReady, companyId, loadDashboard]);
-
-  useEffect(() => {
-    if (!companyId) return;
-    const t = setInterval(loadDashboard, 8_000);
-    return () => clearInterval(t);
-  }, [companyId, loadDashboard]);
 
   useEffect(() => {
     if (!trailVehicleId || !companyId) {
@@ -302,6 +316,35 @@ export default function App() {
   const showAuthWall = firebaseConfigured && auth && !firebaseUser;
   const showRegistration = firebaseUser && needsRegistration && !profileLoading;
 
+  /** Move to email/password screen and remember past marketing pages for this session. */
+  function goToAuth(mode) {
+    sessionStorage.setItem("smartfleet_landing_dismissed", "1");
+    setAuthInitialMode(mode === "register" ? "register" : "login");
+    setAuthFlowStep("auth");
+  }
+
+  function goToAuthAsDriver(mode = "register") {
+    setAuthIntent("driver");
+    setAuthIntentTick((t) => t + 1);
+    goToAuth(mode);
+  }
+
+  function switchRegistrationKind() {
+    setAuthIntentTick((t) => t + 1);
+    if (needsRegistration) {
+      setRegistrationKind(getAuthIntent());
+    }
+  }
+
+  function showGetStartedPage() {
+    setAuthFlowStep("getStarted");
+  }
+
+  function showLandingAgain() {
+    sessionStorage.removeItem("smartfleet_landing_dismissed");
+    setAuthFlowStep("landing");
+  }
+
   if (!authReady || (auth && profileLoading && firebaseUser)) {
     return (
       <div className="app app-center">
@@ -311,6 +354,47 @@ export default function App() {
   }
 
   if (showAuthWall) {
+    if (authFlowStep === "landing") {
+      return (
+        <div className="app">
+          <header className="header header-auth">
+            <div className="brand">
+              <span className="brand-mark" aria-hidden />
+              <div>
+                <h1>SmartFleet AI</h1>
+                <p className="tagline">Fleet operations for high-volume logistics</p>
+              </div>
+            </div>
+          </header>
+          <LandingPage
+            onSignIn={() => goToAuth("login")}
+            onGetStarted={showGetStartedPage}
+            onJoinAsDriver={() => goToAuthAsDriver("register")}
+          />
+        </div>
+      );
+    }
+    if (authFlowStep === "getStarted") {
+      return (
+        <div className="app">
+          <header className="header header-auth">
+            <div className="brand">
+              <span className="brand-mark" aria-hidden />
+              <div>
+                <h1>SmartFleet AI</h1>
+                <p className="tagline">Get started with your organization</p>
+              </div>
+            </div>
+          </header>
+          <GetStartedPage
+            onCreateAccount={() => goToAuth("register")}
+            onSignIn={() => goToAuth("login")}
+            onJoinAsDriver={() => goToAuthAsDriver("register")}
+            onBackToWelcome={showLandingAgain}
+          />
+        </div>
+      );
+    }
     return (
       <div className="app">
         <header className="header header-auth">
@@ -322,12 +406,18 @@ export default function App() {
             </div>
           </div>
         </header>
-        <AuthScreen />
+        <AuthScreen
+          key={`${authInitialMode}-${getAuthIntent()}-${authIntentTick}`}
+          defaultMode={authInitialMode}
+          onBackToWelcome={showLandingAgain}
+          onSwitchRegistrationKind={switchRegistrationKind}
+        />
       </div>
     );
   }
 
   if (showRegistration) {
+    const isDriverJoin = registrationKind === "driver";
     return (
       <div className="app">
         <header className="header header-auth">
@@ -335,16 +425,44 @@ export default function App() {
             <span className="brand-mark" aria-hidden />
             <div>
               <h1>SmartFleet AI</h1>
-              <p className="tagline">Complete your organization setup</p>
+              <p className="tagline">
+                {isDriverJoin ? "Link your driver profile" : "Complete your organization setup"}
+              </p>
             </div>
           </div>
           <button type="button" className="btn btn-secondary" onClick={handleSignOut}>
             Log out
           </button>
         </header>
-        <RegisterCompany onRegistered={refreshProfile} />
+        {isDriverJoin ? (
+          <RegisterDriver
+            onRegistered={async () => {
+              clearAuthIntent();
+              await refreshProfile();
+            }}
+            onSwitchToFleet={() => {
+              setAuthIntent("fleet");
+              setRegistrationKind("fleet");
+            }}
+          />
+        ) : (
+          <RegisterCompany
+            onRegistered={async () => {
+              clearAuthIntent();
+              await refreshProfile();
+            }}
+            onSwitchToDriver={() => {
+              setAuthIntent("driver");
+              setRegistrationKind("driver");
+            }}
+          />
+        )}
       </div>
     );
+  }
+
+  if (profile?.role === "driver" && firebaseUser) {
+    return <DriverApp onSignOut={handleSignOut} />;
   }
 
   return (
@@ -434,7 +552,7 @@ export default function App() {
       </section>
 
       {lastUpdated && (
-        <p className="meta-updated">Last updated {lastUpdated.toLocaleTimeString()} · auto-refresh every 8s</p>
+        <p className="meta-updated">Last updated {lastUpdated.toLocaleTimeString()} · use Refresh to reload data</p>
       )}
 
       <div className="panels">

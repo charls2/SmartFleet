@@ -1,0 +1,78 @@
+.get-started {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.get-started-inner {
+  padding: 1.5rem 0 0;
+}
+
+.get-started-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.get-started-title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.get-started-lead {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.get-started-steps {
+  margin: 0 0 1.75rem;
+  padding-left: 1.25rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.get-started-steps li {
+  margin-bottom: 0.5rem;
+}
+
+.get-started-steps strong {
+  color: var(--text);
+}
+
+.get-started-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.get-started-primary {
+  padding: 0.65rem 1.25rem;
+}
+
+.get-started-back {
+  display: block;
+  margin-top: 1.25rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.get-started-back:hover {
+  color: var(--accent);
+}

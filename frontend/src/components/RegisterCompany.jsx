@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { joinCompany, registerCompany } from "../api.js";
+import { setAuthIntent } from "../authIntent.js";
 
-export default function RegisterCompany({ onRegistered }) {
+export default function RegisterCompany({ onRegistered, onSwitchToDriver }) {
   const [mode, setMode] = useState("create");
   const [companyName, setCompanyName] = useState("");
   const [joinCompanyId, setJoinCompanyId] = useState("");
@@ -133,6 +134,18 @@ export default function RegisterCompany({ onRegistered }) {
               {busy ? "…" : "Join company"}
             </button>
           </form>
+        )}
+        {onSwitchToDriver && (
+          <button
+            type="button"
+            className="btn btn-secondary auth-switch"
+            onClick={() => {
+              setAuthIntent("driver");
+              onSwitchToDriver();
+            }}
+          >
+            Join as driver instead
+          </button>
         )}
       </div>
     </div>

@@ -1,0 +1,99 @@
+================================================================================
+SmartFleet — Firebase web config (VITE_FIREBASE_*) and user accounts
+================================================================================
+
+LANDING PAGE AND "GET STARTED" URLS
+------------------------------------
+There is no separate URL path for the marketing landing page or the Get Started
+screen. SmartFleet is a single-page app (no /welcome route). Flow is driven by
+in-memory state after you load the app:
+
+  Local dev:   http://localhost:5173/
+  Production:  https://<your-domain>/
+
+When Firebase web config is present and you are signed OUT, the root URL first
+shows the Welcome (landing) page. Buttons:
+
+  • "Sign in" / "Continue to sign in" → email/password sign-in form.
+  • "Get started" → an intermediate Get Started page (create account vs sign in),
+    then the same sign-in / create-account form as appropriate.
+
+If VITE_FIREBASE_* is missing, the app may use "tenant header" dev mode instead
+and will not show the landing, Get Started, or Firebase sign-in flow.
+
+After you dismiss the welcome flow once in a browser tab, sessionStorage may
+send you straight to the sign-in form on reload until the tab session ends or
+you use "Back to welcome" from the auth screen.
+
+HOW TO SET UP VITE_FIREBASE_* VARIABLES
+---------------------------------------
+1. Open the Firebase Console: https://console.firebase.google.com/
+2. Select the same Google Cloud / Firebase project where Firestore is enabled
+   for SmartFleet (the backend uses a service account for that project).
+3. Click the gear icon → Project settings.
+4. Under "Your apps", add a Web app (</>) if you do not have one. Register it
+   and copy the config object (apiKey, authDomain, projectId, etc.).
+5. In the machine where you run the frontend, create or edit:
+
+     frontend/.env
+
+   You can start from frontend/.env.example and fill in values.
+
+6. Map Firebase’s fields to these Vite variables (only names differ):
+
+     Firebase field          Variable in frontend/.env
+     ----------------        -------------------------
+     apiKey                    VITE_FIREBASE_API_KEY
+     authDomain                VITE_FIREBASE_AUTH_DOMAIN
+     projectId                 VITE_FIREBASE_PROJECT_ID
+     storageBucket             VITE_FIREBASE_STORAGE_BUCKET
+     messagingSenderId         VITE_FIREBASE_MESSAGING_SENDER_ID
+     appId                     VITE_FIREBASE_APP_ID
+
+   Example (replace with your real values):
+
+     VITE_FIREBASE_API_KEY=AIza...
+     VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+     VITE_FIREBASE_PROJECT_ID=your-project-id
+     VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+     VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+     VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef
+
+7. In Firebase Console → Build → Authentication → Sign-in method, enable
+   Email/Password (required for SmartFleet’s email/password flow).
+
+8. Restart the Vite dev server after any .env change (stop npm run dev, start
+   again). Vite only reads VITE_* at build/dev startup.
+
+SECURITY NOTE
+-------------
+These VITE_FIREBASE_* values are embedded in the built JavaScript bundle. They
+are intended to be public (Firebase treats the Web API key as identifiable, not
+secret). Protect your project with Firebase Security Rules for Firestore, and
+use the backend (Firebase Admin + your Express API) for privileged operations.
+SmartFleet’s dashboard API uses Bearer ID tokens and Firestore user documents,
+not direct client writes to sensitive collections, as designed in this repo.
+
+WHERE ARE USERS AND PASSWORDS STORED?
+-------------------------------------
+• Passwords and primary authentication:
+  Firebase Authentication (Google-managed) stores credentials for Email/Password
+  sign-in. Passwords are NOT stored in plain text in your database; Firebase
+  handles hashing and account security according to Google’s practices.
+
+• Application profile (no password):
+  After sign-up, SmartFleet’s backend creates or updates documents in Firestore,
+  typically under users/<Firebase UID> with fields such as companyId, email,
+  role, and timestamps. These documents do NOT contain the user’s password.
+
+• Company / tenant data:
+  Companies, vehicles, drivers, deliveries, etc. live in Firestore as defined
+  by the backend API — scoped by companyId and your security rules.
+
+• Backend:
+  The Node server uses Firebase Admin SDK with a service account JSON (or ADC)
+  to verify ID tokens and read/write Firestore — never the end-user password.
+
+For details on enabling auth and endpoints, see README.md in the repository.
+
+================================================================================

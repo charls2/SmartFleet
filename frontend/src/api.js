@@ -68,13 +68,19 @@ export function registerCompany(companyName) {
   });
 }
 
-export function joinCompany(companyId, inviteCode, role) {
+export function getJoinDrivers(companyId, inviteCode) {
+  const q = new URLSearchParams({ companyId, inviteCode });
+  return request(`/auth/join-drivers?${q}`);
+}
+
+export function joinCompany(companyId, inviteCode, role, driverId) {
   return request("/auth/join", {
     method: "POST",
     body: JSON.stringify({
       companyId,
       inviteCode,
       ...(role ? { role } : {}),
+      ...(role === "driver" && driverId ? { driverId } : {}),
     }),
   });
 }
@@ -181,6 +187,50 @@ export function postVehicleLocation(vehicleId, body) {
   return request(`/vehicles/${encodeURIComponent(vehicleId)}/location`, {
     method: "POST",
     body: JSON.stringify(body),
+  });
+}
+
+export function getDriverMe() {
+  return request("/driver/me");
+}
+
+export function getDriverDeliveries() {
+  return request("/driver/deliveries");
+}
+
+export function patchDriverDelivery(deliveryId, body) {
+  return request(`/driver/deliveries/${encodeURIComponent(deliveryId)}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export function postDriverLocation(body) {
+  return request("/driver/location", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function getPublicTrack(token) {
+  return fetch(`${API_BASE}/public/track/${encodeURIComponent(token)}`, {
+    headers: { Accept: "application/json" },
+  }).then(async (res) => {
+    const text = await res.text();
+    let data = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { raw: text };
+      }
+    }
+    if (!res.ok) {
+      const err = new Error(data?.error ?? res.statusText ?? "Request failed");
+      err.status = res.status;
+      throw err;
+    }
+    return data;
   });
 }
 
